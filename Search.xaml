@@ -1,0 +1,19 @@
+﻿<Window x:Class="Debts.Search"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Debts"
+         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Search" Height="150" Width="320" BorderThickness="1" ResizeMode="NoResize" WindowStyle="None" BorderBrush="#FF9C27B0" Background="#FFBDC3C7" MouseDown="Window_MouseDown" >
+    <StackPanel VerticalAlignment="Center">
+        <TextBox x:Name="nameTextBox" materialDesign:HintAssist.Hint="Name" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="30 5"/>
+        <DockPanel LastChildFill="False" Margin="30 5">
+            <Button DockPanel.Dock="Right" x:Name="FindButton" Margin="0" Click="FindButton_Click">Find</Button>
+            <Button x:Name="Exit" DockPanel.Dock="Left" Click="Exit_Click">
+                <materialDesign:PackIcon Kind="ExitToApp" />
+            </Button>
+        </DockPanel>
+    </StackPanel>
+</Window>

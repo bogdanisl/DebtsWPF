@@ -1,0 +1,631 @@
+﻿<Window x:Class="Debts.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:n="clr-namespace:Debts.Localizations"
+        xmlns:local="clr-namespace:Debts"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf" 
+        mc:Ignorable="d"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        Title="MainWindow" Height="500" Width="1096" WindowStyle="None" Icon="debt.png" MinHeight="400" MinWidth="650">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"/>
+    </WindowChrome.WindowChrome>
+    <Window.Resources>
+        <ItemsPanelTemplate x:Key="listPanelTemplate">
+            <WrapPanel />
+        </ItemsPanelTemplate>
+        <Style TargetType="ListBoxItem">
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+            </Style.Resources>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        </Style>
+
+        <DataTemplate x:Key="listTemplateDark">
+            <Grid Margin="5">
+                <materialDesign:Flipper Style="{StaticResource MaterialDesignCardFlipper}">
+                    <materialDesign:Flipper.FrontContent>
+                        <Grid Height="250" Width="400" Background="#FF1F2C3A">
+                            <Grid.RowDefinitions>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="1" VerticalAlignment="Top">
+                                <DockPanel MaxHeight="47" LastChildFill="False">
+                                    <TextBlock  Foreground="White" TextWrapping="Wrap" Width="300" Text="{Binding Path=Name}" DockPanel.Dock="Left" FontFamily="Enigmatic Unicode" FontSize="18"></TextBlock>
+                                    <Grid ToolTip="Outstanding debt" Visibility="{Binding Path=IsOutV}" Width="35" Height="47" Background="#FFCF1F1F" DockPanel.Dock="Right" Margin="5 0">
+                                        <Grid.Effect>
+                                            <DropShadowEffect BlurRadius="20" Color="#FF1C242C" RenderingBias="Quality" ShadowDepth="1"/>
+                                        </Grid.Effect>
+                                        <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                    </Grid>
+                                    <Grid ToolTip="Starred debt" Visibility="{Binding Path=IsStarredV}" Width="35" Height="47" Background="#F1C40F" DockPanel.Dock="Right" Margin="5 0">
+                                        <Grid.Effect>
+                                            <DropShadowEffect BlurRadius="20" Color="#FF1C242C" RenderingBias="Quality" ShadowDepth="1"/>
+                                        </Grid.Effect>
+                                        <materialDesign:PackIcon Kind="Star" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                    </Grid>
+                                </DockPanel>
+                                <Grid ToolTip="Closed debt" Visibility="{Binding Path=IsClosedV}" Width="85" Height="30" Background="#FF41A43C" HorizontalAlignment="Right" Margin="0 5">
+                                    <Grid.Effect>
+                                        <DropShadowEffect BlurRadius="20" Color="#FF1C242C" RenderingBias="Quality" ShadowDepth="1"/>
+                                    </Grid.Effect>
+                                    <materialDesign:PackIcon Kind="CloseBox" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                </Grid>
+                                <DockPanel Margin="0,10,0,0" HorizontalAlignment="Center" LastChildFill="False">
+                                    <TextBlock  Foreground="White" Margin="5,0" TextAlignment="Center" Text="{Binding Path=Sum}" FontFamily="Enigmatic Unicode" FontSize="24"></TextBlock>
+                                    <TextBlock  Foreground="White" Margin="5,0" Text="{Binding Path=Currency}" FontFamily="Enigmatic Unicode" FontSize="24"></TextBlock>
+                                </DockPanel>
+                                <DockPanel Margin="150,0" LastChildFill="False">
+                                    <TextBlock Foreground="White" DockPanel.Dock="Left">
+                                    <Run  Text="{Binding Path=Profit}"></Run>
+                                    <Run Text="{Binding Path=Currency}"></Run>
+                                    </TextBlock>
+                                    <TextBlock  Foreground="White" DockPanel.Dock="Right">
+                                        <Run Text="{Binding Path=Procent}"></Run>
+                                        <Run Text="%"></Run>
+                                    </TextBlock>
+                                </DockPanel>
+                                <Button x:Name="cardButton_Edit" Background="#FF0E1621" Foreground="White" BorderThickness="0" Command="{x:Static materialDesign:Flipper.FlipCommand}" Margin="80,0">
+                                    EDIT
+                                </Button>
+                                <DockPanel Margin="0,57,0,0" LastChildFill="False">
+                                    <TextBlock Margin="3,0,0,0" Foreground="White" DockPanel.Dock="Left" Text="Issue date: " FontFamily="Enigmatic Unicode" FontSize="14"></TextBlock>
+                                    <TextBlock Foreground="White" DockPanel.Dock="Left" Width="68" Text="{Binding Path=Issue}" FontFamily="Enigmatic Unicode" FontSize="14"></TextBlock>
+                                    <TextBlock Foreground="White" DockPanel.Dock="Right" Width="150" Visibility="{Binding Path=ReturnDateV}">
+                                        <Run Foreground="White" Text="Return date: " FontFamily="Enigmatic Unicode" FontSize="14"/>
+                                        <Run Foreground="White" Text="{Binding Path=Return}" FontFamily="Enigmatic Unicode" FontSize="14"/>
+                                    </TextBlock>
+                                </DockPanel>
+                            </StackPanel>
+                        </Grid>
+                    </materialDesign:Flipper.FrontContent>
+                    <materialDesign:Flipper.BackContent>
+                        <StackPanel Background="#FF17212B" Height="250" Width="400" HorizontalAlignment="Center">
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <TextBox BorderBrush="White" DockPanel.Dock="Left" ToolTip="{x:Static n:Strings.Name}" Foreground="White" Width="150" Margin="5,10"  materialDesign:HintAssist.Hint="{x:Static n:Strings.Name}" Text="{Binding Path=Name}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" FontSize="14" CaretBrush="White"></TextBox>
+                                <CheckBox BorderBrush="White" Background="White" DockPanel.Dock="Right" Margin="5,10" Foreground="White" x:Name="checkBoxReturnDate" IsChecked="{Binding Path=DateReturn}" Content="{x:Static n:Strings.DateOfReturnCheckBox}"></CheckBox>
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <syncfusion:UpDown BorderThickness="1" BorderBrush="White" Background="{x:Null}" Foreground="White" DockPanel.Dock="Left" Name="upDownSum" Width="120" Height="23" MinValue="0" Value="{Binding Path=Sum}" FontFamily="Enigmatic Unicode" FontSize="14" ToolTip="Sum"/>
+                                <syncfusion:UpDown BorderThickness="1" BorderBrush="White" Background="{x:Null}" Foreground="White" Margin="5,0" DockPanel.Dock="Left" Name="upDownProcent" Width="65" Height="23" MinValue="0" MaxValue="100" Value="{Binding Path=Procent}" FontFamily="Enigmatic Unicode" FontSize="14" ToolTip="{x:Static n:Strings.Procent}"/>
+                                <DatePicker BorderBrush="White" DockPanel.Dock="Right" Foreground="White" Width="140" IsEnabled="{Binding Path=DateReturn}" ToolTip="Pick Date of Return" FontFamily="Enigmatic Unicode" FontSize="14" materialDesign:HintAssist.Hint="Pick Date of return" SelectedDate="{Binding Path=Return}"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <ComboBox BorderBrush="White" Background="#FF17212B" Foreground="White" FontFamily="Enigmatic Unicode" FontSize="14" Width="185" ToolTip="Currency" SelectedIndex="{Binding Path=SelectedIndexCurrency}">
+                                    <ComboBoxItem>UAH</ComboBoxItem>
+                                    <ComboBoxItem>USD</ComboBoxItem>
+                                    <ComboBoxItem>EUR</ComboBoxItem>
+                                    <ComboBoxItem>RUB</ComboBoxItem>
+                                </ComboBox>
+                                <DatePicker BorderBrush="White" DockPanel.Dock="Right" Foreground="White" Width="140" FontFamily="Enigmatic Unicode" FontSize="14" materialDesign:HintAssist.Hint="Pick Date of Issue" ToolTip="Pick Date of Issue" SelectedDate="{Binding Path=Issue}" />
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <ToggleButton DockPanel.Dock="Right" Background="#FF818181" Foreground="White" Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" ToolTip="{x:Static n:Strings.SetAsStarred}" IsChecked="{Binding Path=IsStarred}" Click="ToggleButton_Click">
+                                    <materialDesign:PackIcon Kind="Star"  Height="21" Width="21" />
+                                </ToggleButton>
+                                <ToggleButton x:Name="CloseDebtToggleButton" DockPanel.Dock="Left" Background="#FF818181" Foreground="White" Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" ToolTip="Set closed status to the debt" IsChecked="{Binding Path=IsClosed}" Click="CloseDebtToggleButton_Click">
+                                    <materialDesign:PackIcon Kind="CloseBox"  Height="21" Width="21" />
+                                </ToggleButton>
+                                <Button Margin="5,0" Background="#FF17212B" Foreground="White" BorderThickness="0" ToolTip="Remove debt from account" Click="Button_Click">Remove Debt</Button>
+                            </DockPanel>
+                            <Button Margin="5,10"  Command="{x:Static materialDesign:Flipper.FlipCommand}" Background="#FF17212B" Foreground="White" BorderThickness="0">OK</Button>
+                        </StackPanel>
+                    </materialDesign:Flipper.BackContent>
+                </materialDesign:Flipper>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="listTemplateLight">
+            <Grid Margin="5">
+                <materialDesign:Flipper Style="{StaticResource MaterialDesignCardFlipper}">
+                    <materialDesign:Flipper.FrontContent>
+                        <Grid Height="250" Width="400">
+                            <Grid.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <LinearGradientBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                            <RotateTransform Angle="296.565" CenterY="0.5" CenterX="0.5"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </LinearGradientBrush.RelativeTransform>
+                                    <GradientStop Color="#FFBDC3C7" Offset="0"/>
+                                    <GradientStop Color="#FFE8E8E8" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Grid.Background>
+                            <Grid.RowDefinitions>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="1" VerticalAlignment="Top">
+                                <DockPanel MaxHeight="47" LastChildFill="False">
+                                    <TextBlock TextWrapping="Wrap" Width="300" Text="{Binding Path=Name}" DockPanel.Dock="Left" FontFamily="Enigmatic Unicode" FontSize="18"></TextBlock>
+                                    <Grid ToolTip="Outstanding debt" Visibility="{Binding Path=IsOutV}" Width="35" Height="47" Background="#FFCF1F1F" DockPanel.Dock="Right" Margin="5 0">
+                                        <Grid.Effect>
+                                            <DropShadowEffect BlurRadius="20" Color="#FFECECEC" RenderingBias="Quality" ShadowDepth="1"/>
+                                        </Grid.Effect>
+                                        <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                    </Grid>
+                                    <Grid ToolTip="Starred debt" Visibility="{Binding Path=IsStarredV}" Width="35" Height="47" Background="#F1C40F" DockPanel.Dock="Right" Margin="5 0">
+                                        <Grid.Effect>
+                                            <DropShadowEffect BlurRadius="20" Color="#FFECECEC" RenderingBias="Quality" ShadowDepth="1"/>
+                                        </Grid.Effect>
+                                        <materialDesign:PackIcon Kind="Star" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                    </Grid>
+                                </DockPanel>
+                                <Grid ToolTip="Closed debt" Visibility="{Binding Path=IsClosedV}" Width="85" Height="30" Background="#FF41A43C" HorizontalAlignment="Right" Margin="0 5">
+                                    <Grid.Effect>
+                                        <DropShadowEffect BlurRadius="20" Color="#FFECECEC" RenderingBias="Quality" ShadowDepth="1"/>
+                                    </Grid.Effect>
+                                    <materialDesign:PackIcon Kind="CloseBox" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                </Grid>
+                                <DockPanel Margin="0,10,0,0" HorizontalAlignment="Center" LastChildFill="False">
+                                    <TextBlock Margin="5,0" TextAlignment="Center" Text="{Binding Path=Sum}" FontFamily="Enigmatic Unicode" FontSize="24"></TextBlock>
+                                    <TextBlock Margin="5,0" Text="{Binding Path=Currency}" FontFamily="Enigmatic Unicode" FontSize="24"></TextBlock>
+                                </DockPanel>
+                                <DockPanel Margin="150,0" LastChildFill="False">
+                                    <TextBlock DockPanel.Dock="Left">
+                                    <Run Text="{Binding Path=Profit}"></Run>
+                                    <Run Text="{Binding Path=Currency}"></Run>
+                                    </TextBlock>
+                                    <TextBlock DockPanel.Dock="Right">
+                                        <Run Text="{Binding Path=Procent}"></Run>
+                                        <Run Text="%"></Run>
+                                    </TextBlock>
+                                </DockPanel>
+                                <Button x:Name="cardButton_Edit" Background="#FFECF0F1" Foreground="Black" BorderThickness="0" Command="{x:Static materialDesign:Flipper.FlipCommand}" Margin="80,0">
+                                    EDIT
+                                </Button>
+                                <DockPanel Margin="0,57,0,0" LastChildFill="False">
+                                    <TextBlock Margin="3,0,0,0" DockPanel.Dock="Left" Text="Issue date: " FontFamily="Enigmatic Unicode" FontSize="14"></TextBlock>
+                                    <TextBlock DockPanel.Dock="Left" Width="68" Text="{Binding Path=Issue}" FontFamily="Enigmatic Unicode" FontSize="14"></TextBlock>
+                                    <TextBlock  DockPanel.Dock="Right" Width="150" Visibility="{Binding Path=ReturnDateV}">
+                                        <Run Text="Return date: " FontFamily="Enigmatic Unicode" FontSize="14"/>
+                                        <Run Text="{Binding Path=Return}" FontFamily="Enigmatic Unicode" FontSize="14"/>
+                                    </TextBlock>
+                                </DockPanel>
+                            </StackPanel>
+                        </Grid>
+                    </materialDesign:Flipper.FrontContent>
+                    <materialDesign:Flipper.BackContent>
+                        <StackPanel Height="250" Width="400" HorizontalAlignment="Center">
+                            <StackPanel.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <LinearGradientBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                            <RotateTransform Angle="296.565" CenterY="0.5" CenterX="0.5"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </LinearGradientBrush.RelativeTransform>
+                                    <GradientStop Color="#FFBDC3C7" Offset="0"/>
+                                    <GradientStop Color="#FFE8E8E8" Offset="1"/>
+                                </LinearGradientBrush>
+                            </StackPanel.Background>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <TextBox DockPanel.Dock="Left" ToolTip="{x:Static n:Strings.Name}" Foreground="Black" Width="150" Margin="5,10"  materialDesign:HintAssist.Hint="{x:Static n:Strings.Name}" Text="{Binding Path=Name}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" FontSize="14"></TextBox>
+                                <CheckBox DockPanel.Dock="Right" Margin="5,10"  x:Name="checkBoxReturnDate" IsChecked="{Binding Path=DateReturn}" Content="{x:Static n:Strings.DateOfReturnCheckBox}"></CheckBox>
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <syncfusion:UpDown BorderThickness="1" BorderBrush="Black" Background="{x:Null}" Foreground="Black" DockPanel.Dock="Left" Name="upDownSum" Width="120" Height="23" MinValue="0" Value="{Binding Path=Sum}" FontFamily="Enigmatic Unicode" FontSize="14" ToolTip="Sum"/>
+                                <syncfusion:UpDown BorderThickness="1" BorderBrush="Black" Background="{x:Null}" Foreground="Black" Margin="5,0" DockPanel.Dock="Left" Name="upDownProcent" Width="65" Height="23" MinValue="0" MaxValue="100" Value="{Binding Path=Procent}" FontFamily="Enigmatic Unicode" FontSize="14" ToolTip="{x:Static n:Strings.Procent}"/>
+                                <DatePicker DockPanel.Dock="Right"  Width="140" IsEnabled="{Binding Path=DateReturn}" ToolTip="Pick Date of Return" FontFamily="Enigmatic Unicode" FontSize="14" materialDesign:HintAssist.Hint="Pick Date of return" SelectedDate="{Binding Path=Return}"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <ComboBox FontFamily="Enigmatic Unicode" FontSize="14" Width="185" ToolTip="Currency" SelectedIndex="{Binding Path=SelectedIndexCurrency}">
+                                    <ComboBoxItem>UAH</ComboBoxItem>
+                                    <ComboBoxItem>USD</ComboBoxItem>
+                                    <ComboBoxItem>EUR</ComboBoxItem>
+                                    <ComboBoxItem>RUB</ComboBoxItem>
+                                </ComboBox>
+                                <DatePicker DockPanel.Dock="Right"  Width="140" FontFamily="Enigmatic Unicode" FontSize="14" materialDesign:HintAssist.Hint="Pick Date of Issue" ToolTip="Pick Date of Issue" SelectedDate="{Binding Path=Issue}" />
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <ToggleButton DockPanel.Dock="Right" Background="#FFBDC3C7" Foreground="Black" Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" ToolTip="{x:Static n:Strings.SetAsStarred}" IsChecked="{Binding Path=IsStarred}" Click="ToggleButton_Click">
+                                    <materialDesign:PackIcon Kind="Star"  Height="21" Width="21" />
+                                </ToggleButton>
+                                <ToggleButton x:Name="CloseDebtToggleButton" DockPanel.Dock="Left" Background="#FFECF0F1" Foreground="Black" Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" ToolTip="Set closed status to the debt" IsChecked="{Binding Path=IsClosed}" Click="CloseDebtToggleButton_Click">
+                                    <materialDesign:PackIcon Kind="CloseBox"  Height="21" Width="21" />
+                                </ToggleButton>
+                                <Button Margin="5,0" Background="#FFECF0F1" Foreground="Black" BorderThickness="0" ToolTip="Remove debt from account" Click="Button_Click">Remove Debt</Button>
+                            </DockPanel>
+                            <Button Margin="5,10"  Command="{x:Static materialDesign:Flipper.FlipCommand}" Background="#FFECF0F1" Foreground="Black" BorderThickness="0">OK</Button>
+                        </StackPanel>
+                    </materialDesign:Flipper.BackContent>
+                </materialDesign:Flipper>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="listTemplateViolet">
+            <Grid Margin="5">
+                <materialDesign:Flipper Style="{StaticResource MaterialDesignCardFlipper}">
+                    <materialDesign:Flipper.FrontContent>
+                        <Grid Height="250" Width="400">
+                            <Grid.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <LinearGradientBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                            <RotateTransform Angle="296.565" CenterY="0.5" CenterX="0.5"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </LinearGradientBrush.RelativeTransform>
+                                    <GradientStop Color="#FFA34BD4" Offset="0"/>
+                                    <GradientStop Color="#FFA46FE4" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Grid.Background>
+                            <Grid.RowDefinitions>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="1" VerticalAlignment="Top">
+                                <DockPanel MaxHeight="47" LastChildFill="False">
+                                    <TextBlock  Foreground="White" TextWrapping="Wrap" Width="300" Text="{Binding Path=Name}" DockPanel.Dock="Left" FontFamily="Enigmatic Unicode" FontSize="18"></TextBlock>
+                                    <Grid ToolTip="Outstanding debt" Visibility="{Binding Path=IsOutV}" Width="35" Height="47" Background="#FFCF1F1F" DockPanel.Dock="Right" Margin="5 0">
+                                        <Grid.Effect>
+                                            <DropShadowEffect BlurRadius="20" Color="#FF1C242C" RenderingBias="Quality" ShadowDepth="1"/>
+                                        </Grid.Effect>
+                                        <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                    </Grid>
+                                    <Grid ToolTip="Starred debt" Visibility="{Binding Path=IsStarredV}" Width="35" Height="47" Background="#F1C40F" DockPanel.Dock="Right" Margin="5 0">
+                                        <Grid.Effect>
+                                            <DropShadowEffect BlurRadius="20" Color="#FF1C242C" RenderingBias="Quality" ShadowDepth="1"/>
+                                        </Grid.Effect>
+                                        <materialDesign:PackIcon Kind="Star" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                    </Grid>
+                                </DockPanel>
+                                <Grid ToolTip="Closed debt" Visibility="{Binding Path=IsClosedV}" Width="85" Height="30" Background="#FF41A43C" HorizontalAlignment="Right" Margin="0 5">
+                                    <Grid.Effect>
+                                        <DropShadowEffect BlurRadius="20" Color="#FF1C242C" RenderingBias="Quality" ShadowDepth="1"/>
+                                    </Grid.Effect>
+                                    <materialDesign:PackIcon Kind="CloseBox" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                </Grid>
+                                <DockPanel Margin="0,10,0,0" HorizontalAlignment="Center" LastChildFill="False">
+                                    <TextBlock  Foreground="White" Margin="5,0" TextAlignment="Center" Text="{Binding Path=Sum}" FontFamily="Enigmatic Unicode" FontSize="24"></TextBlock>
+                                    <TextBlock  Foreground="White" Margin="5,0" Text="{Binding Path=Currency}" FontFamily="Enigmatic Unicode" FontSize="24"></TextBlock>
+                                </DockPanel>
+                                <DockPanel Margin="150,0" LastChildFill="False">
+                                    <TextBlock Foreground="White" DockPanel.Dock="Left">
+                                    <Run  Text="{Binding Path=Profit}"></Run>
+                                    <Run Text="{Binding Path=Currency}"></Run>
+                                    </TextBlock>
+                                    <TextBlock  Foreground="White" DockPanel.Dock="Right">
+                                        <Run Text="{Binding Path=Procent}"></Run>
+                                        <Run Text="%"></Run>
+                                    </TextBlock>
+                                </DockPanel>
+                                <Button x:Name="cardButton_Edit" Background="#FF8522BD" Foreground="White" BorderThickness="0" Command="{x:Static materialDesign:Flipper.FlipCommand}" Margin="80,0">
+                                    EDIT
+                                </Button>
+                                <DockPanel Margin="0,57,0,0" LastChildFill="False">
+                                    <TextBlock Margin="3,0,0,0" Foreground="White" DockPanel.Dock="Left" Text="Issue date: " FontFamily="Enigmatic Unicode" FontSize="14"></TextBlock>
+                                    <TextBlock Foreground="White" DockPanel.Dock="Left" Width="68" Text="{Binding Path=Issue}" FontFamily="Enigmatic Unicode" FontSize="14"></TextBlock>
+                                    <TextBlock Foreground="White" DockPanel.Dock="Right" Width="150" Visibility="{Binding Path=ReturnDateV}">
+                                        <Run Foreground="White" Text="Return date: " FontFamily="Enigmatic Unicode" FontSize="14"/>
+                                        <Run Foreground="White" Text="{Binding Path=Return}" FontFamily="Enigmatic Unicode" FontSize="14"/>
+                                    </TextBlock>
+                                </DockPanel>
+                            </StackPanel>
+                        </Grid>
+                    </materialDesign:Flipper.FrontContent>
+                    <materialDesign:Flipper.BackContent>
+                        <StackPanel Height="250" Width="400" HorizontalAlignment="Center">
+                            <StackPanel.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <LinearGradientBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                            <RotateTransform Angle="296.565" CenterY="0.5" CenterX="0.5"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </LinearGradientBrush.RelativeTransform>
+                                    <GradientStop Color="#FFA34BD4" Offset="0"/>
+                                    <GradientStop Color="#FFA46FE4" Offset="1"/>
+                                </LinearGradientBrush>
+                            </StackPanel.Background>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <TextBox BorderBrush="White" DockPanel.Dock="Left" ToolTip="{x:Static n:Strings.Name}" Foreground="White" Width="150" Margin="5,10"  materialDesign:HintAssist.Hint="{x:Static n:Strings.Name}" Text="{Binding Path=Name}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" FontSize="14" CaretBrush="White"></TextBox>
+                                <CheckBox BorderBrush="White" Background="White" DockPanel.Dock="Right" Margin="5,10" Foreground="White" x:Name="checkBoxReturnDate" IsChecked="{Binding Path=DateReturn}" Content="{x:Static n:Strings.DateOfReturnCheckBox}"></CheckBox>
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <syncfusion:UpDown BorderThickness="1" BorderBrush="White" Background="{x:Null}" Foreground="White" DockPanel.Dock="Left" Name="upDownSum" Width="120" Height="23" MinValue="0" Value="{Binding Path=Sum}" FontFamily="Enigmatic Unicode" FontSize="14" ToolTip="Sum"/>
+                                <syncfusion:UpDown BorderThickness="1" BorderBrush="White" Background="{x:Null}" Foreground="White" Margin="5,0" DockPanel.Dock="Left" Name="upDownProcent" Width="65" Height="23" MinValue="0" MaxValue="100" Value="{Binding Path=Procent}" FontFamily="Enigmatic Unicode" FontSize="14" ToolTip="{x:Static n:Strings.Procent}"/>
+                                <DatePicker BorderBrush="White" DockPanel.Dock="Right" Foreground="White" Width="140" IsEnabled="{Binding Path=DateReturn}" ToolTip="Pick Date of Return" FontFamily="Enigmatic Unicode" FontSize="14" materialDesign:HintAssist.Hint="Pick Date of return" SelectedDate="{Binding Path=Return}"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <ComboBox BorderBrush="White" Background="{x:Null}" Foreground="White" FontFamily="Enigmatic Unicode" FontSize="14" Width="185" ToolTip="Currency" SelectedIndex="{Binding Path=SelectedIndexCurrency}">
+                                    <ComboBoxItem>UAH</ComboBoxItem>
+                                    <ComboBoxItem>USD</ComboBoxItem>
+                                    <ComboBoxItem>EUR</ComboBoxItem>
+                                    <ComboBoxItem>RUB</ComboBoxItem>
+                                </ComboBox>
+                                <DatePicker BorderBrush="White" DockPanel.Dock="Right" Foreground="White" Width="140" FontFamily="Enigmatic Unicode" FontSize="14" materialDesign:HintAssist.Hint="Pick Date of Issue" ToolTip="Pick Date of Issue" SelectedDate="{Binding Path=Issue}" />
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <ToggleButton DockPanel.Dock="Right" Background="#FF8522BD" Foreground="White" Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" ToolTip="{x:Static n:Strings.SetAsStarred}" IsChecked="{Binding Path=IsStarred}" Click="ToggleButton_Click">
+                                    <materialDesign:PackIcon Kind="Star"  Height="21" Width="21" />
+                                </ToggleButton>
+                                <ToggleButton x:Name="CloseDebtToggleButton" DockPanel.Dock="Left" Background="#FFAF5BDE" Foreground="White" Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" ToolTip="Set closed status to the debt" IsChecked="{Binding Path=IsClosed}" Click="CloseDebtToggleButton_Click">
+                                    <materialDesign:PackIcon Kind="CloseBox"  Height="21" Width="21" />
+                                </ToggleButton>
+                                <Button Margin="5,0" Background="#FF8522BD" Foreground="White" BorderThickness="0" ToolTip="Remove debt from account" Click="Button_Click">Remove Debt</Button>
+                            </DockPanel>
+                            <Button Margin="5,10"  Command="{x:Static materialDesign:Flipper.FlipCommand}" Background="#FF8522BD" Foreground="White" BorderThickness="0">OK</Button>
+                        </StackPanel>
+                    </materialDesign:Flipper.BackContent>
+                </materialDesign:Flipper>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="listTemplateBlue">
+            <Grid Margin="5">
+                <materialDesign:Flipper Style="{StaticResource MaterialDesignCardFlipper}">
+                    <materialDesign:Flipper.FrontContent>
+                        <Grid Height="250" Width="400">
+                            <Grid.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <LinearGradientBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                            <RotateTransform Angle="296.565" CenterY="0.5" CenterX="0.5"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </LinearGradientBrush.RelativeTransform>
+                                    <GradientStop Color="#FF2FA0EC" Offset="0"/>
+                                    <GradientStop Color="#FF51B8E0" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Grid.Background>
+                            <Grid.RowDefinitions>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="1" VerticalAlignment="Top">
+                                <DockPanel MaxHeight="47" LastChildFill="False">
+                                    <TextBlock  Foreground="White" TextWrapping="Wrap" Width="300" Text="{Binding Path=Name}" DockPanel.Dock="Left" FontFamily="Enigmatic Unicode" FontSize="18"></TextBlock>
+                                    <Grid ToolTip="Outstanding debt" Visibility="{Binding Path=IsOutV}" Width="35" Height="47" Background="#FFCF1F1F" DockPanel.Dock="Right" Margin="5 0">
+                                        <Grid.Effect>
+                                            <DropShadowEffect BlurRadius="20" Color="#FF1C242C" RenderingBias="Quality" ShadowDepth="1"/>
+                                        </Grid.Effect>
+                                        <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                    </Grid>
+                                    <Grid ToolTip="Starred debt" Visibility="{Binding Path=IsStarredV}" Width="35" Height="47" Background="#F1C40F" DockPanel.Dock="Right" Margin="5 0">
+                                        <Grid.Effect>
+                                            <DropShadowEffect BlurRadius="20" Color="#FF1C242C" RenderingBias="Quality" ShadowDepth="1"/>
+                                        </Grid.Effect>
+                                        <materialDesign:PackIcon Kind="Star" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                    </Grid>
+                                </DockPanel>
+                                <Grid ToolTip="Closed debt" Visibility="{Binding Path=IsClosedV}" Width="85" Height="30" Background="#FF41A43C" HorizontalAlignment="Right" Margin="0 5">
+                                    <Grid.Effect>
+                                        <DropShadowEffect BlurRadius="20" Color="#FF1C242C" RenderingBias="Quality" ShadowDepth="1"/>
+                                    </Grid.Effect>
+                                    <materialDesign:PackIcon Kind="CloseBox" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                                </Grid>
+                                <DockPanel Margin="0,10,0,0" HorizontalAlignment="Center" LastChildFill="False">
+                                    <TextBlock  Foreground="White" Margin="5,0" TextAlignment="Center" Text="{Binding Path=Sum}" FontFamily="Enigmatic Unicode" FontSize="24"></TextBlock>
+                                    <TextBlock  Foreground="White" Margin="5,0" Text="{Binding Path=Currency}" FontFamily="Enigmatic Unicode" FontSize="24"></TextBlock>
+                                </DockPanel>
+                                <DockPanel Margin="150,0" LastChildFill="False">
+                                    <TextBlock Foreground="White" DockPanel.Dock="Left">
+                                    <Run  Text="{Binding Path=Profit}"></Run>
+                                    <Run Text="{Binding Path=Currency}"></Run>
+                                    </TextBlock>
+                                    <TextBlock  Foreground="White" DockPanel.Dock="Right">
+                                        <Run Text="{Binding Path=Procent}"></Run>
+                                        <Run Text="%"></Run>
+                                    </TextBlock>
+                                </DockPanel>
+                                <Button x:Name="cardButton_Edit" Background="#FF1591F7" Foreground="White" BorderThickness="0" Command="{x:Static materialDesign:Flipper.FlipCommand}" Margin="80,0">
+                                    EDIT
+                                </Button>
+                                <DockPanel Margin="0,57,0,0" LastChildFill="False">
+                                    <TextBlock Margin="3,0,0,0" Foreground="White" DockPanel.Dock="Left" Text="Issue date: " FontFamily="Enigmatic Unicode" FontSize="14"></TextBlock>
+                                    <TextBlock Foreground="White" DockPanel.Dock="Left" Width="68" Text="{Binding Path=Issue}" FontFamily="Enigmatic Unicode" FontSize="14"></TextBlock>
+                                    <TextBlock Foreground="White" DockPanel.Dock="Right" Width="150" Visibility="{Binding Path=ReturnDateV}">
+                                        <Run Foreground="White" Text="Return date: " FontFamily="Enigmatic Unicode" FontSize="14"/>
+                                        <Run Foreground="White" Text="{Binding Path=Return}" FontFamily="Enigmatic Unicode" FontSize="14"/>
+                                    </TextBlock>
+                                </DockPanel>
+                            </StackPanel>
+                        </Grid>
+                    </materialDesign:Flipper.FrontContent>
+                    <materialDesign:Flipper.BackContent>
+                        <StackPanel Height="250" Width="400" HorizontalAlignment="Center">
+                            <StackPanel.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <LinearGradientBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                            <RotateTransform Angle="296.565" CenterY="0.5" CenterX="0.5"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </LinearGradientBrush.RelativeTransform>
+                                    <GradientStop Color="#FF2FA0EC" Offset="0"/>
+                                    <GradientStop Color="#FF51B8E0" Offset="1"/>
+                                </LinearGradientBrush>
+                            </StackPanel.Background>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <TextBox BorderBrush="White" DockPanel.Dock="Left" ToolTip="{x:Static n:Strings.Name}" Foreground="White" Width="150" Margin="5,10"  materialDesign:HintAssist.Hint="{x:Static n:Strings.Name}" Text="{Binding Path=Name}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" FontSize="14" CaretBrush="White"></TextBox>
+                                <CheckBox BorderBrush="White" Background="White" DockPanel.Dock="Right" Margin="5,10" Foreground="White" x:Name="checkBoxReturnDate" IsChecked="{Binding Path=DateReturn}" Content="{x:Static n:Strings.DateOfReturnCheckBox}"></CheckBox>
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <syncfusion:UpDown BorderThickness="1" BorderBrush="White" Background="{x:Null}" Foreground="White" DockPanel.Dock="Left" Name="upDownSum" Width="120" Height="23" MinValue="0" Value="{Binding Path=Sum}" FontFamily="Enigmatic Unicode" FontSize="14" ToolTip="Sum"/>
+                                <syncfusion:UpDown BorderThickness="1" BorderBrush="White" Background="{x:Null}" Foreground="White" Margin="5,0" DockPanel.Dock="Left" Name="upDownProcent" Width="65" Height="23" MinValue="0" MaxValue="100" Value="{Binding Path=Procent}" FontFamily="Enigmatic Unicode" FontSize="14" ToolTip="{x:Static n:Strings.Procent}"/>
+                                <DatePicker BorderBrush="White" DockPanel.Dock="Right" Foreground="White" Width="140" IsEnabled="{Binding Path=DateReturn}" ToolTip="Pick Date of Return" FontFamily="Enigmatic Unicode" FontSize="14" materialDesign:HintAssist.Hint="Pick Date of return" SelectedDate="{Binding Path=Return}"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <ComboBox BorderBrush="White" Background="{x:Null}" Foreground="White" FontFamily="Enigmatic Unicode" FontSize="14" Width="185" ToolTip="Currency" SelectedIndex="{Binding Path=SelectedIndexCurrency}">
+                                    <ComboBoxItem>UAH</ComboBoxItem>
+                                    <ComboBoxItem>USD</ComboBoxItem>
+                                    <ComboBoxItem>EUR</ComboBoxItem>
+                                    <ComboBoxItem>RUB</ComboBoxItem>
+                                </ComboBox>
+                                <DatePicker BorderBrush="White" DockPanel.Dock="Right" Foreground="White" Width="140" FontFamily="Enigmatic Unicode" FontSize="14" materialDesign:HintAssist.Hint="Pick Date of Issue" ToolTip="Pick Date of Issue" SelectedDate="{Binding Path=Issue}" />
+                            </DockPanel>
+                            <DockPanel Margin="0,5" LastChildFill="False">
+                                <ToggleButton DockPanel.Dock="Right" Background="#FF1591F7" Foreground="White" Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" ToolTip="{x:Static n:Strings.SetAsStarred}" IsChecked="{Binding Path=IsStarred}" Click="ToggleButton_Click">
+                                    <materialDesign:PackIcon Kind="Star"  Height="21" Width="21" />
+                                </ToggleButton>
+                                <ToggleButton x:Name="CloseDebtToggleButton" DockPanel.Dock="Left" Background="#FF0B8BF5" Foreground="White" Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" ToolTip="Set closed status to the debt" IsChecked="{Binding Path=IsClosed}" Click="CloseDebtToggleButton_Click">
+                                    <materialDesign:PackIcon Kind="CloseBox"  Height="21" Width="21" />
+                                </ToggleButton>
+                                <Button Margin="5,0" Background="#FF8522BD" Foreground="White" BorderThickness="0" ToolTip="Remove debt from account" Click="Button_Click">Remove Debt</Button>
+                            </DockPanel>
+                            <Button Margin="5,10"  Command="{x:Static materialDesign:Flipper.FlipCommand}" Background="#FF1591F7" Foreground="White" BorderThickness="0">OK</Button>
+                        </StackPanel>
+                    </materialDesign:Flipper.BackContent>
+                </materialDesign:Flipper>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.Background>
+            <ImageBrush/>
+        </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="200*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" MinWidth="227"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+
+        <!--LeftMenu-->
+        <Grid x:Name="GridLeft" Grid.Row="1" Background="#FFA46FE4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="85*"/>
+                <RowDefinition Height="347*"/>
+                <RowDefinition Height="35*"/>
+            </Grid.RowDefinitions>
+            <Border x:Name="TopLeftBorder" Background="#FFA46FE4"></Border>
+            <Label x:Name="LogoLable" HorizontalAlignment="Center" FontFamily="Bungee Regular" FontSize="34" Margin="50,0,51,0" Width="126">Debts</Label>
+            <StackPanel x:Name="stackPanelLeft" Grid.Row="1">
+
+                <Button Height="40"  x:Name="createDebtButton" Margin="10,3,10,10" Background="#FF8522BD" BorderBrush="#FF8522BD" Click="createDebtButton_Click" FontSize="16">
+                    <Grid Width="170">
+                        <materialDesign:PackIcon Kind="Creation" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtblock_CreateDebt" HorizontalAlignment="Center" Text="Create new debt" FontFamily="Champagne &amp; Limousines"/>
+                    </Grid>
+                </Button>
+
+                <Button Height="40"  x:Name="searchButton" Margin="10,3" Background="#FF8522BD" BorderBrush="#FF8522BD" FontSize="16" Click="searchButton_Click">
+                    <Grid Width="170">
+                        <materialDesign:PackIcon Kind="AccountSearch" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtblock_Search" HorizontalAlignment="Center" Text="Search" FontFamily="Champagne &amp; Limousines"/>
+                    </Grid>
+                </Button>
+                <Button Height="40"  x:Name="removeAllButton" Margin="10,3" Background="#FF8522BD" BorderBrush="#FF8522BD" FontSize="16" Click="removeAllButton_Click">
+                    <Grid Width="170">
+                        <materialDesign:PackIcon Kind="BookmarkRemove" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtblock_RemoveAll" HorizontalAlignment="Center" Text="Remove all debts" FontFamily="Champagne &amp; Limousines"/>
+                    </Grid>
+                </Button>
+                <Button Height="40"  x:Name="converterButton" Margin="10,3" Background="#FF8522BD" BorderBrush="#FF8522BD" FontSize="16" Click="converterButton_Click">
+                    <Grid Width="170">
+                        <materialDesign:PackIcon Kind="SwapHorizontal" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtblock_Converter" HorizontalAlignment="Center" Text="Currency converter" FontFamily="Champagne &amp; Limousines"/>
+                    </Grid>
+                </Button>
+            </StackPanel>
+            <Button x:Name="logoutButton" Grid.Row="2" Margin="10,3,10,-2" Background="#FF8522BD" BorderBrush="#FF8522BD" Height="Auto" Click="logoutButton_Click" FontSize="16">
+                <Grid Width="170">
+                    <materialDesign:PackIcon Kind="Logout" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="txtblock_Logout" HorizontalAlignment="Center" Text="Logout" FontFamily="Champagne &amp; Limousines"/>
+                </Grid>
+            </Button>
+        </Grid>
+
+
+        <!--TopMenu-->
+        <Grid x:Name="TopGrid" Grid.ColumnSpan="2" Background="#FF8522BD" MouseDown="TopGrid_MouseDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="229*"/>
+                <ColumnDefinition Width="31*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Width="124">
+                <Button Margin="27,0,0,0" x:Name="settingsButton" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" Click="settingsButton_Click">
+                    <materialDesign:PackIcon Kind="Settings"/>
+                </Button>
+                <Button x:Name="ButtonMinimize" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" Click="ButtonMinimize_Click">
+                    <materialDesign:PackIcon Kind="WindowMinimize"/>
+                </Button>
+                <Button x:Name="ButtonMaximize" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" Click="ButtonMaximize_Click">
+                    <materialDesign:PackIcon Kind="WindowMaximize"/>
+                </Button>
+                <Button x:Name="ButtonFechar" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" Click="ButtonFechar_Click">
+                    <materialDesign:PackIcon Kind="Close"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+
+        <!--TabControl-->
+        <dragablz:TabablzControl BorderThickness="0" x:Name="tabControl1" Grid.Column="1" Grid.Row="1" BorderBrush="#FFA46FE4" Background="#FFA97EDC">
+            <dragablz:TabablzControl.InterTabController>
+                <dragablz:InterTabController/>
+            </dragablz:TabablzControl.InterTabController>
+            <TabItem x:Name="tabItemAll" Header="{x:Static n:Strings.AllDebts}">
+                <ListBox x:Name="listBoxDebts" ItemTemplate="{DynamicResource listTemplateLight}" ItemsPanel="{DynamicResource listPanelTemplate}" SelectedItem="{Binding Path=SelectedDebt, Mode=OneWayToSource}" ItemsSource="{Binding Path=ActingDebts}">
+
+                </ListBox>
+            </TabItem>
+            <TabItem x:Name="tabItemStarred" Header="{x:Static n:Strings.Starred}">
+                <ListBox x:Name="listBoxStarredDebts" ItemTemplate="{DynamicResource listTemplateLight}" ItemsPanel="{DynamicResource listPanelTemplate}" SelectedItem="{Binding Path=SelectedDebt, Mode=OneWayToSource}" ItemsSource="{Binding Path=StarredDebts}">
+
+                </ListBox>
+
+            </TabItem>
+            <TabItem x:Name="tabItemClosed" Header="{x:Static n:Strings.Closed}">
+                <ListBox x:Name="listBoxClosedDebts" ItemTemplate="{DynamicResource listTemplateLight}" ItemsPanel="{DynamicResource listPanelTemplate}" SelectedItem="{Binding Path=SelectedDebt, Mode=OneWayToSource}" ItemsSource="{Binding Path=ClosedDebts}">
+
+                </ListBox>
+            </TabItem>
+            <TabItem x:Name="tabItemOutstanding" Header="{x:Static n:Strings.Outstanding}">
+                <ListBox x:Name="listBoxOutstandingDebts" ItemTemplate="{DynamicResource listTemplateLight}" ItemsPanel="{DynamicResource listPanelTemplate}" SelectedItem="{Binding Path=SelectedDebt, Mode=OneWayToSource}" ItemsSource="{Binding Path=OutstandingDebts}">
+
+                </ListBox>
+            </TabItem>
+        </dragablz:TabablzControl>
+
+
+        <!--Login-->
+        <GroupBox Visibility="Hidden" x:Name="groupBoxStart" Grid.Row="1" Grid.ColumnSpan="2" Background="White">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="279*"/>
+                    <RowDefinition Height="152*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="217*"/>
+                    <ColumnDefinition Width="282*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center" Grid.Column="1" Grid.RowSpan="2" Height="310" Margin="0,60,0,61">
+                    <TextBlock x:Name="labelWelcome" Text="Welcome" FontSize="30" FontWeight="Bold" Margin="0 0 0 20"/>
+
+                    <Grid Margin="0 0 0 15">
+                        <Button x:Name="loginButton" Content="Registration" HorizontalAlignment="Right" Click="loginButton_Click"/>
+                        <TextBlock x:Name="textBlockErrorLogin" Foreground="Red" FontSize="16" VerticalAlignment="Center" FontWeight="Bold"></TextBlock>
+                    </Grid>
+
+                    <TextBox x:Name="usernameTextBox" materialDesign:HintAssist.Hint="Username" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 5"/>
+                    <PasswordBox x:Name="passwordTextBox" materialDesign:HintAssist.Hint="Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="0 5"/>
+                    <PasswordBox x:Name="confirmPasswordTextBox" materialDesign:HintAssist.Hint="Confirm Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="0 5"/>
+                    <Button x:Name="registerButton" Content="Register" Margin="3 20" Click="registerButton_Click"/>
+                </StackPanel>
+                <GroupBox Background="White" x:Name="groupBoxLogin" Grid.Column="1" Grid.Row="1">
+                    <StackPanel>
+                        <Button x:Name="loginingButton" Click="loginingButton_Click">Login</Button>
+                    </StackPanel>
+                </GroupBox>
+                <Border x:Name="borderStart" Grid.RowSpan="2" Background="White">
+                    <Image x:Name="ImageLogin" Source="Resources/LightTheme2.png"></Image>
+
+                </Border>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>

@@ -1,0 +1,50 @@
+﻿<Window x:Class="Debts.Converter"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Debts"
+        mc:Ignorable="d"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf" 
+        Title="Converter" Height="262.53" Width="220.513" ResizeMode="NoResize" WindowStyle="None">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"/>
+    </WindowChrome.WindowChrome>
+    <StackPanel>
+        <DockPanel x:Name="TopPanel" LastChildFill="False" MouseDown="TopPanel_MouseDown" >
+            <Button x:Name="ButtonClose" DockPanel.Dock="Right" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" Click="ButtonClose_Click">
+                <materialDesign:PackIcon Kind="Close"/>
+            </Button>
+        </DockPanel>
+        <TextBlock FontFamily="Enigmatic Unicode" FontSize="20">
+            <Run Text="USD: "></Run>
+            <Run Name="usd"></Run>
+            <LineBreak/>
+            <Run Text="EUR: "></Run>
+            <Run Name="eur"></Run>
+            <LineBreak/>
+            <Run Text="RUB: "></Run>
+            <Run Name="rub"></Run>
+            <LineBreak/>
+            <ComboBox Margin="0,5" x:Name="SelectedCurrency" SelectionChanged="SelectedCurrency_SelectionChanged">
+                <ComboBoxItem>UAH</ComboBoxItem>
+                <ComboBoxItem>USD</ComboBoxItem>
+                <ComboBoxItem>EUR</ComboBoxItem>
+                <ComboBoxItem>RUB</ComboBoxItem>
+            </ComboBox>
+            <LineBreak/>
+           <Run Text="UAH:"/>
+            <syncfusion:UpDown Margin="4,0" Name="upDownUAH" Width="100" Height="23" MinValue="0" ValueChanged="upDownUAH_ValueChanged"/>
+            <LineBreak/>
+            <Run Text="USD:"/>
+            <syncfusion:UpDown Margin="5,0" Name="upDownUSD" Width="100" Height="23" MinValue="0" ValueChanged="upDownUSD_ValueChanged"/>
+            <LineBreak/>
+            <Run Text="EUR:"/>
+            <syncfusion:UpDown Margin="7,0" Name="upDownEUR" Width="100" Height="23" MinValue="0" ValueChanged="upDownEUR_ValueChanged"/>
+            <LineBreak/>
+            <Run Text="RUB:"/>
+            <syncfusion:UpDown Margin="5,0" Name="upDownRUB" Width="100" Height="23" MinValue="0" ValueChanged="upDownRUB_ValueChanged"/>
+        </TextBlock>
+    </StackPanel>
+</Window>
